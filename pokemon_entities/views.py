@@ -76,13 +76,14 @@ def show_pokemon(request, pokemon_id):
                 'img_url': 'img_url',
                 'title_ru': 'title_ru',
             },
-            'previous_evolution': {
-                'pokemon_id': 'pokemon_id',
-                'img_url': 'img_url',
-                'title_ru': 'title_ru',
-            },
             # 'element_type': 'element_type',
         }
+        if previous_evolution := current_pokemon.previous_evolution:
+            requested_pokemon['previous_evolution'] = {
+                'pokemon_id': previous_evolution.id,
+                'img_url': previous_evolution.image.url if previous_evolution.image else None,
+                'title_ru': previous_evolution.title,
+            }
     except PokemonEntity.DoesNotExist:
         return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
 
