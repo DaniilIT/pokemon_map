@@ -65,13 +65,11 @@ def show_pokemon(request, pokemon_id):
     try:
         current_pokemon = Pokemon.objects.get(id=pokemon_id)
         requested_pokemon = {
-            'title': 'title',
             'title_ru': current_pokemon.title,
             'title_en': current_pokemon.title_en,
             'title_jp': current_pokemon.title_jp,
             'description': current_pokemon.description,
             'img_url': current_pokemon.image.url if current_pokemon.image else None,
-            # 'element_type': 'element_type',
         }
         if previous_evolution := current_pokemon.previous_evolution:
             requested_pokemon['previous_evolution'] = {
