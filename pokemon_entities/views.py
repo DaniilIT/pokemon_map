@@ -67,8 +67,8 @@ def show_pokemon(request, pokemon_id):
         requested_pokemon = {
             'title': 'title',
             'title_ru': current_pokemon.title,
-            'title_en': 'title_en',
-            'title_jp': 'title_jp',
+            'title_en': current_pokemon.title_en,
+            'title_jp': current_pokemon.title_jp,
             'description': current_pokemon.description,
             'img_url': current_pokemon.image.url if current_pokemon.image else None,
             'next_evolution': {
