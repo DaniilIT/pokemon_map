@@ -1,7 +1,7 @@
 import folium
 
 from django.http import HttpResponseNotFound
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.utils.timezone import localtime
 
 from .models import Pokemon, PokemonEntity
@@ -57,29 +57,26 @@ def show_all_pokemons(request):
 
 
 def show_pokemon(request, pokemon_id):
-    try:
-        current_pokemon = Pokemon.objects.get(id=pokemon_id)
-        requested_pokemon = {
-            'title_ru': current_pokemon.title,
-            'title_en': current_pokemon.title_en,
-            'title_jp': current_pokemon.title_jp,
-            'description': current_pokemon.description,
-            'img_url': current_pokemon.image.url if current_pokemon.image else None,
+    current_pokemon = get_object_or_404(Pokemon, id=pokemon_id)
+    requested_pokemon = {
+        'title_ru': current_pokemon.title,
+        'title_en': current_pokemon.title_en,
+        'title_jp': current_pokemon.title_jp,
+        'description': current_pokemon.description,
+        'img_url': current_pokemon.image.url if current_pokemon.image else None,
+    }
+    if previous_evolution := current_pokemon.previous_evolution:
+        requested_pokemon['previous_evolution'] = {
+            'pokemon_id': previous_evolution.id,
+            'img_url': previous_evolution.image.url if previous_evolution.image else None,
+            'title_ru': previous_evolution.title,
         }
-        if previous_evolution := current_pokemon.previous_evolution:
-            requested_pokemon['previous_evolution'] = {
-                'pokemon_id': previous_evolution.id,
-                'img_url': previous_evolution.image.url if previous_evolution.image else None,
-                'title_ru': previous_evolution.title,
-            }
-        if next_evolution := current_pokemon.next_evolutions.first():
-            requested_pokemon['next_evolution'] = {
-                'pokemon_id': next_evolution.id,
-                'img_url': next_evolution.image.url if next_evolution.image else None,
-                'title_ru': next_evolution.title,
-            }
-    except PokemonEntity.DoesNotExist:
-        return HttpResponseNotFound('<h1>Такой покемон не найден</h1>')
+    if next_evolution := current_pokemon.next_evolutions.first():
+        requested_pokemon['next_evolution'] = {
+            'pokemon_id': next_evolution.id,
+            'img_url': next_evolution.image.url if next_evolution.image else None,
+            'title_ru': next_evolution.title,
+        }
 
     local_time = localtime()
     pokemon_entities = current_pokemon.pokemon_entities.filter(
