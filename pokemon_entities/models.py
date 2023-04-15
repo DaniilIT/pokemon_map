@@ -9,7 +9,7 @@ class Pokemon(models.Model):
 	description = models.TextField('Описание', blank=True)
 	image = models.ImageField('Картинка', upload_to='pokemons', null=True, blank=True)
 	previous_evolution = models.ForeignKey('self', on_delete=models.SET_NULL,
-		related_name='next_evolution', verbose_name='Произошел от', null=True, blank=True)
+		related_name='next_evolutions', verbose_name='Произошли от', null=True, blank=True)
 
 	class Meta:
 		verbose_name = 'Вид покемона'

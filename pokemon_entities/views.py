@@ -77,7 +77,7 @@ def show_pokemon(request, pokemon_id):
                 'img_url': previous_evolution.image.url if previous_evolution.image else None,
                 'title_ru': previous_evolution.title,
             }
-        if next_evolution := current_pokemon.next_evolution.first():
+        if next_evolution := current_pokemon.next_evolutions.first():
             requested_pokemon['next_evolution'] = {
                 'pokemon_id': next_evolution.id,
                 'img_url': next_evolution.image.url if next_evolution.image else None,
