@@ -3,6 +3,7 @@ from django.db import models
 
 class PokemonElementType(models.Model):
     title = models.CharField('Название', max_length=200)
+    image = models.ImageField('Картинка', upload_to='elements', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Стихия'

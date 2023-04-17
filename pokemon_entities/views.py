@@ -79,6 +79,7 @@ def show_pokemon(request, pokemon_id):
         'title_jp': current_pokemon.title_jp,
         'description': current_pokemon.description,
         'img_url': current_pokemon.image.url if current_pokemon.image else None,
+        'element_type': [],
     }
     if previous_evolution := current_pokemon.previous_evolution:
         requested_pokemon['previous_evolution'] = {
@@ -92,6 +93,13 @@ def show_pokemon(request, pokemon_id):
             'img_url': next_evolution.image.url if next_evolution.image else None,
             'title_ru': next_evolution.title,
         }
+
+    elements = current_pokemon.element_type.all()
+    for element in elements:
+        requested_pokemon['element_type'].append({
+            'title': element.title,
+            'img': element.image.url if element.image else None,
+        })
 
     local_time = localtime()
     pokemon_entities = current_pokemon.entities.filter(
