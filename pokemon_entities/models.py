@@ -4,6 +4,8 @@ from django.db import models
 class PokemonElementType(models.Model):
     title = models.CharField('Название', max_length=200)
     image = models.ImageField('Картинка', upload_to='elements', null=True, blank=True)
+    against = models.ManyToManyField( 'self', symmetrical=False, related_name='beats',
+        verbose_name='Силен против', blank=True)
 
     class Meta:
         verbose_name = 'Стихия'
@@ -20,7 +22,7 @@ class Pokemon(models.Model):
     description = models.TextField('Описание', blank=True)
     image = models.ImageField('Картинка', upload_to='pokemons', null=True, blank=True)
     element_type = models.ManyToManyField(PokemonElementType, related_name='pokemos',
-        verbose_name='Стихии')
+        verbose_name='Стихии', blank=True)
     previous_evolution = models.ForeignKey(
         'self', on_delete=models.SET_NULL, related_name='next_evolutions',
         verbose_name='Произошли от', null=True, blank=True

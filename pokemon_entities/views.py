@@ -96,10 +96,15 @@ def show_pokemon(request, pokemon_id):
 
     elements = current_pokemon.element_type.all()
     for element in elements:
-        requested_pokemon['element_type'].append({
+        element_data = {
             'title': element.title,
             'img': element.image.url if element.image else None,
-        })
+            'strong_against': [],
+        }
+        elements_against = element.against.all()
+        for element_against in elements_against:
+            element_data['strong_against'].append(element_against.title)
+        requested_pokemon['element_type'].append(element_data)
 
     local_time = localtime()
     pokemon_entities = current_pokemon.entities.filter(
