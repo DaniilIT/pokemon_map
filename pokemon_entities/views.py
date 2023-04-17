@@ -1,5 +1,6 @@
-import folium
+from string import Template
 
+import folium
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404
 from django.utils.timezone import localtime
@@ -13,17 +14,31 @@ DEFAULT_IMAGE_URL = (
     '/latest/fixed-aspect-ratio-down/width/240/height/240?cb=20130525215832'
     '&fill=transparent'
 )
+DESCRITIONS = Template("""
+    <b>Уровень</b>: $level<br>
+    <b>Здоровье</b>: $health<br>
+    <b>Атака</b>: $strength<br>
+    <b>Защита</b>: $defence<br>
+    <b>Выносливость</b>: $stamina<br>
+    <b>Исчезнет</b>: $disappeared_at<br>
+""")
 
 
-def add_pokemon(folium_map, lat, lon, image_url=DEFAULT_IMAGE_URL):
-    icon = folium.features.CustomIcon(
-        image_url,
-        icon_size=(50, 50),
+def add_pokemon(folium_map, pokemon_entity, image_url=DEFAULT_IMAGE_URL):
+    descriptions = DESCRITIONS.substitute(
+        level=pokemon_entity.level,
+        health=pokemon_entity.health,
+        strength=pokemon_entity.strength,
+        defence=pokemon_entity.defence,
+        stamina=pokemon_entity.stamina,
+        disappeared_at=pokemon_entity.disappeared_at.strftime('%d.%m.%Y %H:%M')
     )
+    icon = folium.features.CustomIcon(image_url, icon_size=(50, 50))
+    popup = folium.Popup(descriptions, max_width=200)
     folium.Marker(
-        [lat, lon],
-        # Warning! `tooltip` attribute is disabled intentionally
-        # to fix strange folium cyrillic encoding bug
+        [pokemon_entity.lat, pokemon_entity.lon],
+        tooltip=descriptions,  # при наведении
+        popup=popup,  # при нажатии
         icon=icon,
     ).add_to(folium_map)
 
@@ -39,7 +54,7 @@ def show_all_pokemons(request):
         pokemon = pokemon_entity.pokemon
         image_url = request.build_absolute_uri(pokemon.image.url) if pokemon.image \
             else DEFAULT_IMAGE_URL
-        add_pokemon(folium_map, pokemon_entity.lat, pokemon_entity.lon, image_url)
+        add_pokemon(folium_map, pokemon_entity, image_url)
 
     pokemons = Pokemon.objects.all()
     pokemons_on_page = []
@@ -88,7 +103,7 @@ def show_pokemon(request, pokemon_id):
         pokemon = pokemon_entity.pokemon
         image_url = request.build_absolute_uri(pokemon.image.url) if pokemon.image \
             else DEFAULT_IMAGE_URL
-        add_pokemon(folium_map, pokemon_entity.lat, pokemon_entity.lon, image_url)
+        add_pokemon(folium_map, pokemon_entity, image_url)
 
     return render(request, 'pokemon.html', context={
         'map': folium_map._repr_html_(), 'pokemon': requested_pokemon
